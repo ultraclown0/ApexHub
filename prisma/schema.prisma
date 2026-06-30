@@ -1,0 +1,254 @@
+// ApexHub — схема БД. Подробности и пояснения: ARCHITECTURE.md §3.
+// learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============ СПРАВОЧНИКИ ============
+
+model Tournament {
+  id            String      @id @default(cuid())
+  slug          String      @unique // для URL: /tournaments/algs-y4-champs
+  name          String
+  region        String? // EMEA / NA / APAC / Global
+  tier          String? // official / community / S / A / B
+  organizer     String?
+  logoUrl       String?
+  startDate     DateTime?
+  endDate       DateTime?
+  status        EventStatus @default(UPCOMING)
+  descriptionRu String? // опц. локализованное описание
+  descriptionEn String?
+
+  stages       Stage[]
+  matches      Match[]
+  participants TournamentParticipant[]
+  streams      Stream[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, startDate])
+}
+
+model Stage {
+  id           String     @id @default(cuid())
+  tournamentId String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  name         String // Group Stage / Playoffs / Finals
+  order        Int        @default(0)
+  matches      Match[]
+}
+
+model Match {
+  id           String      @id @default(cuid())
+  tournamentId String
+  tournament   Tournament  @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  stageId      String?
+  stage        Stage?      @relation(fields: [stageId], references: [id])
+  label        String // «Day 1 — Group A»
+  scheduledAt  DateTime? // начало окна трансляции
+  endsAt       DateTime? // конец окна; если пусто — считаем start + дефолтная длительность
+  status       EventStatus @default(UPCOMING)
+  statusLocked Boolean     @default(false) // true = статус выставлен вручную в админке, расписание игнорируется
+  order        Int         @default(0)
+
+  games   Game[]
+  streams Stream[] // POV-стримы, привязанные к матчу
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tournamentId, status])
+}
+
+model Game {
+  id         String      @id @default(cuid())
+  matchId    String
+  match      Match       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  gameNumber Int // 1..N внутри матча
+  map        String? // World's Edge / Storm Point / E-District
+  startedAt  DateTime?
+  status     EventStatus @default(UPCOMING)
+
+  teamResults TeamGameResult[]
+  playerStats PlayerGameStat[]
+
+  @@unique([matchId, gameNumber])
+}
+
+// ============ КОМАНДЫ / ИГРОКИ ============
+
+model Team {
+  id      String  @id @default(cuid())
+  slug    String  @unique
+  name    String
+  tag     String? // короткий тег, напр. «TSM»
+  logoUrl String?
+  region  String?
+
+  rosterSpots  Roster[]
+  participants TournamentParticipant[]
+  teamResults  TeamGameResult[]
+  playerStats  PlayerGameStat[]
+  streams      Stream[]
+}
+
+model Player {
+  id       String  @id @default(cuid())
+  slug     String  @unique
+  handle   String // ник в игре / на сцене
+  realName String?
+  country  String?
+  role     String? // IGL / fragger / support
+  photoUrl String?
+
+  rosterSpots Roster[]
+  playerStats PlayerGameStat[]
+  streams     Stream[] // личные POV-каналы игрока
+}
+
+model Roster {
+  id        String    @id @default(cuid())
+  teamId    String
+  team      Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  playerId  String
+  player    Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  startDate DateTime?
+  endDate   DateTime? // null = текущий состав
+
+  @@index([teamId])
+  @@index([playerId])
+}
+
+model TournamentParticipant {
+  id             String     @id @default(cuid())
+  tournamentId   String
+  tournament     Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  teamId         String
+  team           Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  seed           Int?
+  finalPlacement Int?
+  totalPoints    Int?
+
+  @@unique([tournamentId, teamId])
+}
+
+// ============ СТАТИСТИКА ============
+
+model TeamGameResult {
+  id              String @id @default(cuid())
+  gameId          String
+  game            Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  teamId          String
+  team            Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  placement       Int? // 1..20
+  kills           Int    @default(0) // суммарно по команде
+  placementPoints Int    @default(0) // очки за место (правила ALGS)
+  killPoints      Int    @default(0) // очки за киллы
+  totalPoints     Int    @default(0)
+
+  @@unique([gameId, teamId])
+  @@index([teamId])
+}
+
+model PlayerGameStat {
+  id             String  @id @default(cuid())
+  gameId         String
+  game           Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  playerId       String
+  player         Player  @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  teamId         String
+  team           Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  kills          Int     @default(0)
+  assists        Int     @default(0)
+  knockdowns     Int     @default(0)
+  damageDealt    Int     @default(0)
+  damageTaken    Int     @default(0)
+  damageFromRing Int     @default(0)
+  revives        Int     @default(0)
+  respawnsGiven  Int     @default(0)
+  survivalTime   Int? // секунды
+  placement      Int? // место команды в этой игре
+  character      String? // легенда (если есть)
+
+  @@unique([gameId, playerId])
+  @@index([playerId])
+  @@index([teamId])
+}
+
+// ============ ТРАНСЛЯЦИИ ============
+
+model Stream {
+  id            String     @id @default(cuid())
+  platform      String     @default("twitch")
+  channelName   String // twitch login (для embed)
+  type          StreamType
+  title         String?
+  language      String? // ru / en
+  isLive        Boolean    @default(false) // кэш статуса
+  lastCheckedAt DateTime?
+
+  // К чему привязан стрим (любое из полей может быть пустым):
+  tournamentId String?
+  tournament   Tournament? @relation(fields: [tournamentId], references: [id])
+  matchId      String?
+  match        Match?      @relation(fields: [matchId], references: [id])
+  playerId     String?
+  player       Player?     @relation(fields: [playerId], references: [id])
+  teamId       String?
+  team         Team?       @relation(fields: [teamId], references: [id])
+
+  @@index([isLive])
+  @@index([tournamentId])
+}
+
+// ============ СЛУЖЕБНОЕ ============
+
+// Связь наших записей с ID во внешних источниках (DGS, Liquipedia, ALS API)
+model ExternalRef {
+  id         String  @id @default(cuid())
+  source     String // dgs / liquipedia / alsapi
+  entityType String // tournament / team / player / game
+  entityId   String // id в нашей базе
+  externalId String // id в источнике
+  url        String?
+
+  @@unique([source, entityType, externalId])
+  @@index([entityType, entityId])
+}
+
+// Состояние синхронизации воркера ингеста
+model SyncState {
+  id        String    @id @default(cuid())
+  source    String // dgs / liquipedia / twitch
+  endpoint  String // getTournaments / getScores ...
+  lastRunAt DateTime?
+  status    String? // ok / error
+  cursor    String?
+  note      String?
+
+  @@unique([source, endpoint])
+}
+
+// ============ ENUMS ============
+
+enum EventStatus {
+  UPCOMING
+  LIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum StreamType {
+  OFFICIAL
+  PLAYER_POV
+  CASTER
+  WATCH_PARTY
+}

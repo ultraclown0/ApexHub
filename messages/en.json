@@ -1,0 +1,136 @@
+{
+  "Metadata": {
+    "title": "ApexHub",
+    "description": "Tournament Apex Legends: multi-stream viewing and match stats"
+  },
+  "Nav": {
+    "tournaments": "Tournaments",
+    "stats": "Stats"
+  },
+  "Footer": {
+    "tagline": "A non-commercial hub for tournament Apex Legends: multi-stream viewing and match stats.",
+    "attribution": "Tournament data via apexlegendsstatus.com (DGS). Catalog data from Liquipedia, licensed under CC-BY-SA."
+  },
+  "Home": {
+    "title": "ApexHub",
+    "tagline": "Watch tournament Apex Legends in multi-stream and compare match stats — all in one place.",
+    "comingSoon": "Under construction",
+    "ctaTournaments": "Browse tournaments",
+    "liveNow": "Live now",
+    "noLive": "No live broadcasts right now.",
+    "upcoming": "Upcoming",
+    "noUpcoming": "No upcoming matches.",
+    "recentResults": "Recent results",
+    "noResults": "No results yet.",
+    "activeTournaments": "Tournaments",
+    "topTeams": "Top teams",
+    "watch": "Watch",
+    "streamsCount": "{count} streams",
+    "winner": "Winner",
+    "pts": "pts",
+    "allTournaments": "All tournaments →"
+  },
+  "Stats": {
+    "title": "Stats & Compare",
+    "players": "Players",
+    "teams": "Teams",
+    "allTournaments": "All tournaments",
+    "empty": "No data yet.",
+    "rank": "#",
+    "player": "Player",
+    "team": "Team",
+    "games": "G",
+    "kills": "Kills",
+    "assists": "Assists",
+    "damage": "Damage",
+    "killsPerGame": "K/game",
+    "points": "Points",
+    "wins": "Wins",
+    "avgPlace": "Avg. place"
+  },
+  "Team": {
+    "notFound": "Team not found.",
+    "roster": "Roster",
+    "stats": "Stats",
+    "tournaments": "Tournament history",
+    "recentMatches": "Recent matches",
+    "games": "Games",
+    "kills": "Kills",
+    "wins": "Wins",
+    "avgPlace": "Avg. place",
+    "points": "Points",
+    "place": "Place",
+    "tournament": "Tournament",
+    "noData": "No data yet."
+  },
+  "Player": {
+    "notFound": "Player not found.",
+    "team": "Team",
+    "role": "Role",
+    "country": "Country",
+    "freeAgent": "Free agent",
+    "watchTwitch": "Watch on Twitch",
+    "stats": "Stats",
+    "games": "Games",
+    "kills": "Kills",
+    "assists": "Assists",
+    "damage": "Damage",
+    "avgKills": "Kills / game",
+    "avgDamage": "Damage / game",
+    "recentMatches": "Recent matches",
+    "noData": "No data yet."
+  },
+  "Tournaments": {
+    "title": "Tournaments",
+    "empty": "No tournaments yet.",
+    "noMatch": "No tournaments match the filters.",
+    "teams": "teams",
+    "matches": "matches",
+    "filters": {
+      "region": "Region",
+      "season": "Season",
+      "allRegions": "All regions",
+      "allSeasons": "All seasons",
+      "reset": "Reset"
+    },
+    "status": {
+      "UPCOMING": "Upcoming",
+      "LIVE": "Live now",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    }
+  },
+  "TournamentDetail": {
+    "notFound": "Tournament not found.",
+    "standings": "Standings",
+    "matches": "Matches",
+    "participants": "Participants",
+    "place": "#",
+    "team": "Team",
+    "points": "Points",
+    "games": "games",
+    "noMatches": "No matches yet.",
+    "noParticipants": "No participants yet."
+  },
+  "Match": {
+    "notFound": "Match not found.",
+    "backToTournament": "Back to tournament",
+    "streams": "Streams",
+    "noStreams": "No streams linked to this match.",
+    "soundHint": "Sound plays on the selected stream — click 🔊 on another to switch.",
+    "stats": "Stats",
+    "game": "Game",
+    "map": "Map",
+    "official": "Official",
+    "playerPov": "Player POV",
+    "table": {
+      "place": "#",
+      "team": "Team",
+      "kills": "Kills",
+      "points": "Points"
+    },
+    "topFraggers": "Top fraggers",
+    "player": "Player",
+    "damage": "Damage"
+  }
+}

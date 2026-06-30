@@ -1,0 +1,136 @@
+{
+  "Metadata": {
+    "title": "ApexHub",
+    "description": "Турнирный Apex Legends: мультистримы и статистика матчей"
+  },
+  "Nav": {
+    "tournaments": "Турниры",
+    "stats": "Статистика"
+  },
+  "Footer": {
+    "tagline": "Некоммерческий хаб турнирного Apex Legends: мультистримы и статистика матчей.",
+    "attribution": "Турнирные данные — apexlegendsstatus.com (DGS). Каталог — Liquipedia, лицензия CC-BY-SA."
+  },
+  "Home": {
+    "title": "ApexHub",
+    "tagline": "Смотрите турнирный Apex Legends в режиме мультистрима и сравнивайте статистику матчей — в одном месте.",
+    "comingSoon": "В разработке",
+    "ctaTournaments": "Смотреть турниры",
+    "liveNow": "Сейчас в эфире",
+    "noLive": "Сейчас нет трансляций.",
+    "upcoming": "Афиша",
+    "noUpcoming": "Нет предстоящих матчей.",
+    "recentResults": "Последние результаты",
+    "noResults": "Результатов пока нет.",
+    "activeTournaments": "Турниры",
+    "topTeams": "Топ команды",
+    "watch": "Смотреть",
+    "streamsCount": "{count} стримов",
+    "winner": "Победитель",
+    "pts": "очк.",
+    "allTournaments": "Все турниры →"
+  },
+  "Stats": {
+    "title": "Статистика и сравнение",
+    "players": "Игроки",
+    "teams": "Команды",
+    "allTournaments": "Все турниры",
+    "empty": "Данных пока нет.",
+    "rank": "#",
+    "player": "Игрок",
+    "team": "Команда",
+    "games": "И",
+    "kills": "Киллы",
+    "assists": "Ассисты",
+    "damage": "Урон",
+    "killsPerGame": "К/игра",
+    "points": "Очки",
+    "wins": "Победы",
+    "avgPlace": "Сред. место"
+  },
+  "Team": {
+    "notFound": "Команда не найдена.",
+    "roster": "Состав",
+    "stats": "Статистика",
+    "tournaments": "История турниров",
+    "recentMatches": "Недавние матчи",
+    "games": "Игр",
+    "kills": "Киллы",
+    "wins": "Победы",
+    "avgPlace": "Сред. место",
+    "points": "Очки",
+    "place": "Место",
+    "tournament": "Турнир",
+    "noData": "Данных пока нет."
+  },
+  "Player": {
+    "notFound": "Игрок не найден.",
+    "team": "Команда",
+    "role": "Роль",
+    "country": "Страна",
+    "freeAgent": "Без команды",
+    "watchTwitch": "Смотреть на Twitch",
+    "stats": "Статистика",
+    "games": "Игр",
+    "kills": "Киллы",
+    "assists": "Ассисты",
+    "damage": "Урон",
+    "avgKills": "Киллы / игра",
+    "avgDamage": "Урон / игра",
+    "recentMatches": "Недавние матчи",
+    "noData": "Данных пока нет."
+  },
+  "Tournaments": {
+    "title": "Турниры",
+    "empty": "Турниров пока нет.",
+    "noMatch": "Под фильтры ничего не подошло.",
+    "teams": "команд",
+    "matches": "матчей",
+    "filters": {
+      "region": "Регион",
+      "season": "Сезон",
+      "allRegions": "Все регионы",
+      "allSeasons": "Все сезоны",
+      "reset": "Сбросить"
+    },
+    "status": {
+      "UPCOMING": "Скоро",
+      "LIVE": "Идёт сейчас",
+      "COMPLETED": "Завершён",
+      "CANCELLED": "Отменён"
+    }
+  },
+  "TournamentDetail": {
+    "notFound": "Турнир не найден.",
+    "standings": "Турнирная таблица",
+    "matches": "Матчи",
+    "participants": "Участники",
+    "place": "#",
+    "team": "Команда",
+    "points": "Очки",
+    "games": "игр",
+    "noMatches": "Матчей пока нет.",
+    "noParticipants": "Участников пока нет."
+  },
+  "Match": {
+    "notFound": "Матч не найден.",
+    "backToTournament": "К турниру",
+    "streams": "Трансляции",
+    "noStreams": "К этому матчу не привязаны трансляции.",
+    "soundHint": "Звук — у выбранной трансляции. Нажмите 🔊 у другой, чтобы переключить.",
+    "stats": "Статистика",
+    "game": "Игра",
+    "map": "Карта",
+    "official": "Официальная",
+    "playerPov": "POV игрока",
+    "table": {
+      "place": "#",
+      "team": "Команда",
+      "kills": "Киллы",
+      "points": "Очки"
+    },
+    "topFraggers": "Топ по киллам",
+    "player": "Игрок",
+    "damage": "Урон"
+  }
+}
