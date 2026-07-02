@@ -143,16 +143,16 @@ export default async function MatchPage({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="sticky left-0 z-20 w-10 min-w-10 max-w-10 bg-muted">
+                      <TableHead className="sticky left-0 z-20 w-10 min-w-10 max-w-10 bg-card">
                         {t("table.place")}
                       </TableHead>
-                      <TableHead className="sticky left-10 z-20 w-40 min-w-40 max-w-40 bg-muted">
+                      <TableHead className="sticky left-10 z-20 w-40 min-w-40 max-w-40 bg-card">
                         {t("table.team")}
                       </TableHead>
-                      <TableHead className="sticky left-[200px] z-20 w-16 min-w-16 max-w-16 bg-muted text-center">
+                      <TableHead className="sticky left-[200px] z-20 w-16 min-w-16 max-w-16 bg-card text-center">
                         {t("table.kills")}
                       </TableHead>
-                      <TableHead className="sticky left-[264px] z-20 w-16 min-w-16 max-w-16 bg-muted text-center shadow-[inset_-1px_0_0_0_var(--border)]">
+                      <TableHead className="sticky left-[264px] z-20 w-16 min-w-16 max-w-16 bg-card text-center shadow-[inset_-1px_0_0_0_var(--border)]">
                         {t("table.points")}
                       </TableHead>
                       {gameNumbers.map((n) => (
