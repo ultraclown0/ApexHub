@@ -39,6 +39,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-table-header: var(--table-header);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -53,6 +54,8 @@
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
+  /* Фон шапки таблиц — отдельный токен (по умолчанию = цвет карточки). */
+  --table-header: oklch(1 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
@@ -89,6 +92,8 @@
   --foreground: oklch(0.97 0.004 60);
   --card: oklch(0.205 0.009 40);
   --card-foreground: oklch(0.97 0.004 60);
+  /* Фон шапки таблиц — отдельный токен (по умолчанию = цвет карточки). */
+  --table-header: oklch(0.205 0.009 40);
   --popover: oklch(0.205 0.009 40);
   --popover-foreground: oklch(0.97 0.004 60);
   --primary: oklch(0.62 0.21 26);
