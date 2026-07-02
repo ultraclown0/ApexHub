@@ -17,9 +17,9 @@ export const dynamic = "force-dynamic";
 // Медальки для призовых мест: золото / серебро / бронза. Цветной квадрат-подложка,
 // текст не перекрашиваем в цвет медали (тёмный — только для читаемости на фоне).
 const MEDAL: Record<number, string> = {
-  1: "bg-yellow-400/70 text-black",
-  2: "bg-slate-300/70 text-black",
-  3: "bg-amber-600/70 text-black",
+  1: "bg-amber-300 text-black",
+  2: "bg-slate-400 text-black",
+  3: "bg-orange-300 text-black",
 };
 
 function Placement({ place }: { place: number | null }) {
