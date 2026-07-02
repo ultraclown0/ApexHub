@@ -137,12 +137,14 @@ export default async function MatchPage({
                       {gameNumbers.map((n) => (
                         <TableHead
                           key={n}
-                          className="text-center"
+                          className="px-1 text-center"
                           title={gameMapByNumber.get(n) ?? undefined}
                         >
                           {t("game")} {n}
                         </TableHead>
                       ))}
+                      {/* распорка: забирает лишнюю ширину, чтобы колонки игр были плотными */}
+                      <TableHead className="w-full" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -169,11 +171,12 @@ export default async function MatchPage({
                         {gameNumbers.map((n) => (
                           <TableCell
                             key={n}
-                            className="text-center tabular-nums text-muted-foreground"
+                            className="px-1 text-center tabular-nums text-muted-foreground"
                           >
                             {row.places[n] ?? "—"}
                           </TableCell>
                         ))}
+                        <TableCell className="w-full" />
                       </TableRow>
                     ))}
                   </TableBody>
