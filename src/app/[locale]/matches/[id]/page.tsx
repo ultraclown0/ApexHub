@@ -14,6 +14,27 @@ import {
 
 export const dynamic = "force-dynamic";
 
+// Медальки для призовых мест: золото / серебро / бронза. Цветной квадрат-подложка,
+// текст не перекрашиваем в цвет медали (тёмный — только для читаемости на фоне).
+const MEDAL: Record<number, string> = {
+  1: "bg-yellow-400 text-black",
+  2: "bg-slate-300 text-black",
+  3: "bg-amber-600 text-white",
+};
+
+function Placement({ place }: { place: number | null }) {
+  if (place == null) return <>—</>;
+  const medal = MEDAL[place];
+  if (!medal) return <>{place}</>;
+  return (
+    <span
+      className={`inline-flex size-6 items-center justify-center rounded-md text-xs font-semibold ${medal}`}
+    >
+      {place}
+    </span>
+  );
+}
+
 export default async function MatchPage({
   params,
 }: {
@@ -171,7 +192,7 @@ export default async function MatchPage({
                             key={n}
                             className="text-center tabular-nums text-muted-foreground"
                           >
-                            {row.places[n] ?? "—"}
+                            <Placement place={row.places[n] ?? null} />
                           </TableCell>
                         ))}
                       </TableRow>
