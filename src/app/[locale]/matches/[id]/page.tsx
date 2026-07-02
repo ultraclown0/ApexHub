@@ -125,8 +125,14 @@ export default async function MatchPage({
                       <TableHead className="sticky left-0 z-20 w-10 bg-background">
                         {t("table.place")}
                       </TableHead>
-                      <TableHead className="sticky left-10 z-20 min-w-32 border-r border-border bg-background">
+                      <TableHead className="sticky left-10 z-20 w-40 bg-background">
                         {t("table.team")}
+                      </TableHead>
+                      <TableHead className="sticky left-[200px] z-20 w-14 bg-background text-right">
+                        {t("table.kills")}
+                      </TableHead>
+                      <TableHead className="sticky left-[256px] z-20 w-16 border-r border-border bg-background text-right">
+                        {t("table.points")}
                       </TableHead>
                       {gameNumbers.map((n) => (
                         <TableHead
@@ -137,12 +143,6 @@ export default async function MatchPage({
                           {t("game")} {n}
                         </TableHead>
                       ))}
-                      <TableHead className="sticky right-14 z-20 w-14 border-l border-border bg-background text-right">
-                        {t("table.kills")}
-                      </TableHead>
-                      <TableHead className="sticky right-0 z-20 w-14 bg-background text-right">
-                        {t("table.points")}
-                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -151,13 +151,20 @@ export default async function MatchPage({
                         <TableCell className="sticky left-0 z-10 w-10 bg-background font-medium">
                           {i + 1}
                         </TableCell>
-                        <TableCell className="sticky left-10 z-10 min-w-32 border-r border-border bg-background whitespace-nowrap">
+                        <TableCell className="sticky left-10 z-10 w-40 max-w-40 bg-background">
                           <Link
                             href={`/teams/${row.slug}`}
-                            className="hover:underline"
+                            title={row.name}
+                            className="block truncate hover:underline"
                           >
                             {row.name}
                           </Link>
+                        </TableCell>
+                        <TableCell className="sticky left-[200px] z-10 w-14 bg-background text-right tabular-nums">
+                          {row.kills}
+                        </TableCell>
+                        <TableCell className="sticky left-[256px] z-10 w-16 border-r border-border bg-background text-right font-medium tabular-nums">
+                          {row.points}
                         </TableCell>
                         {gameNumbers.map((n) => (
                           <TableCell
@@ -167,12 +174,6 @@ export default async function MatchPage({
                             {row.places[n] ?? "—"}
                           </TableCell>
                         ))}
-                        <TableCell className="sticky right-14 z-10 w-14 border-l border-border bg-background text-right tabular-nums">
-                          {row.kills}
-                        </TableCell>
-                        <TableCell className="sticky right-0 z-10 w-14 bg-background text-right font-medium tabular-nums">
-                          {row.points}
-                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
