@@ -128,10 +128,10 @@ export default async function MatchPage({
                       <TableHead className="sticky left-10 z-20 w-40 min-w-40 max-w-40 bg-background">
                         {t("table.team")}
                       </TableHead>
-                      <TableHead className="sticky left-[200px] z-20 w-16 min-w-16 max-w-16 bg-background text-right">
+                      <TableHead className="sticky left-[200px] z-20 w-16 min-w-16 max-w-16 bg-background text-center">
                         {t("table.kills")}
                       </TableHead>
-                      <TableHead className="sticky left-[264px] z-20 w-16 min-w-16 max-w-16 bg-background text-right shadow-[inset_-1px_0_0_0_var(--border)]">
+                      <TableHead className="sticky left-[264px] z-20 w-16 min-w-16 max-w-16 bg-background text-center shadow-[inset_-1px_0_0_0_var(--border)]">
                         {t("table.points")}
                       </TableHead>
                       {gameNumbers.map((n) => (
@@ -160,10 +160,10 @@ export default async function MatchPage({
                             {row.name}
                           </Link>
                         </TableCell>
-                        <TableCell className="sticky left-[200px] z-10 w-16 min-w-16 max-w-16 bg-background text-right tabular-nums">
+                        <TableCell className="sticky left-[200px] z-10 w-16 min-w-16 max-w-16 bg-background text-center tabular-nums">
                           {row.kills}
                         </TableCell>
-                        <TableCell className="sticky left-[264px] z-10 w-16 min-w-16 max-w-16 bg-background text-right font-medium tabular-nums shadow-[inset_-1px_0_0_0_var(--border)]">
+                        <TableCell className="sticky left-[264px] z-10 w-16 min-w-16 max-w-16 bg-background text-center font-medium tabular-nums shadow-[inset_-1px_0_0_0_var(--border)]">
                           {row.points}
                         </TableCell>
                         {gameNumbers.map((n) => (
