@@ -118,25 +118,29 @@ export default async function MatchPage({
           {summary.length > 0 && (
             <section>
               <h2 className="mb-3 text-xl font-semibold">{t("stats")}</h2>
-              <div className="overflow-x-auto rounded-md border">
+              <div className="rounded-md border [&_[data-slot=table-container]]:rounded-md">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-10">{t("table.place")}</TableHead>
-                      <TableHead className="min-w-32">{t("table.team")}</TableHead>
-                      {gameNumbers.map((n, idx) => (
+                      <TableHead className="sticky left-0 z-20 w-10 bg-background">
+                        {t("table.place")}
+                      </TableHead>
+                      <TableHead className="sticky left-10 z-20 min-w-32 border-r border-border bg-background">
+                        {t("table.team")}
+                      </TableHead>
+                      {gameNumbers.map((n) => (
                         <TableHead
                           key={n}
-                          className={`text-center ${idx === 0 ? "border-l border-border" : ""}`}
+                          className="text-center"
                           title={gameMapByNumber.get(n) ?? undefined}
                         >
                           {t("game")} {n}
                         </TableHead>
                       ))}
-                      <TableHead className="border-l border-border text-right">
+                      <TableHead className="sticky right-14 z-20 w-14 border-l border-border bg-background text-right">
                         {t("table.kills")}
                       </TableHead>
-                      <TableHead className="text-right">
+                      <TableHead className="sticky right-0 z-20 w-14 bg-background text-right">
                         {t("table.points")}
                       </TableHead>
                     </TableRow>
@@ -144,8 +148,10 @@ export default async function MatchPage({
                   <TableBody>
                     {summary.map((row, i) => (
                       <TableRow key={row.slug}>
-                        <TableCell className="font-medium">{i + 1}</TableCell>
-                        <TableCell className="whitespace-nowrap">
+                        <TableCell className="sticky left-0 z-10 w-10 bg-background font-medium">
+                          {i + 1}
+                        </TableCell>
+                        <TableCell className="sticky left-10 z-10 min-w-32 border-r border-border bg-background whitespace-nowrap">
                           <Link
                             href={`/teams/${row.slug}`}
                             className="hover:underline"
@@ -153,18 +159,18 @@ export default async function MatchPage({
                             {row.name}
                           </Link>
                         </TableCell>
-                        {gameNumbers.map((n, idx) => (
+                        {gameNumbers.map((n) => (
                           <TableCell
                             key={n}
-                            className={`text-center tabular-nums text-muted-foreground ${idx === 0 ? "border-l border-border" : ""}`}
+                            className="text-center tabular-nums text-muted-foreground"
                           >
                             {row.places[n] ?? "—"}
                           </TableCell>
                         ))}
-                        <TableCell className="border-l border-border text-right tabular-nums">
+                        <TableCell className="sticky right-14 z-10 w-14 border-l border-border bg-background text-right tabular-nums">
                           {row.kills}
                         </TableCell>
-                        <TableCell className="text-right font-medium tabular-nums">
+                        <TableCell className="sticky right-0 z-10 w-14 bg-background text-right font-medium tabular-nums">
                           {row.points}
                         </TableCell>
                       </TableRow>
