@@ -179,14 +179,24 @@ async function ingestOneTournament(
     },
   });
 
-  // Создаём игры (с картой/номером из метаданных, если удалось их получить).
+  // Нумеруем игры по РЕАЛЬНОМУ порядку (хронологии): первая сыгранная = Game 1.
+  // Таймстамп зашит в id игры ("<tid>-<uuid>:<code>:<ts>"). Не полагаемся на
+  // нумерацию DGS (у неё самая свежая игра — Game 1).
+  const tsOf = (gid: string) => Number(gid.split(":")[2]) || 0;
+  const chronoNumber = new Map<number, number>(); // индекс в gamesPlayed → номер игры
+  gamesPlayed
+    .map((gid, i) => ({ i, ts: tsOf(gid) }))
+    .sort((a, b) => a.ts - b.ts)
+    .forEach((o, pos) => chronoNumber.set(o.i, pos + 1));
+
+  // Создаём игры (карта — из метаданных, если удалось их получить).
   const games = [];
   for (let i = 0; i < gameCount; i++) {
     const meta = gameMetaById.get(gamesPlayed[i] ?? "");
     const g = await prisma.game.create({
       data: {
         matchId: match.id,
-        gameNumber: meta?.number ?? i + 1,
+        gameNumber: chronoNumber.get(i) ?? i + 1,
         map: meta?.map ?? null,
         status: "COMPLETED",
       },
