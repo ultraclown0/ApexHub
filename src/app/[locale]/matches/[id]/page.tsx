@@ -128,10 +128,10 @@ export default async function MatchPage({
                       <TableHead className="sticky left-10 z-20 w-40 min-w-40 max-w-40 bg-background">
                         {t("table.team")}
                       </TableHead>
-                      <TableHead className="sticky left-[200px] z-20 w-14 min-w-14 max-w-14 bg-background text-right">
+                      <TableHead className="sticky left-[200px] z-20 w-16 min-w-16 max-w-16 bg-background text-right">
                         {t("table.kills")}
                       </TableHead>
-                      <TableHead className="sticky left-[256px] z-20 w-14 min-w-14 max-w-14 border-r border-border bg-background text-right">
+                      <TableHead className="sticky left-[264px] z-20 w-16 min-w-16 max-w-16 bg-background text-right shadow-[inset_-1px_0_0_0_var(--border)]">
                         {t("table.points")}
                       </TableHead>
                       {gameNumbers.map((n) => (
@@ -143,8 +143,6 @@ export default async function MatchPage({
                           {t("game")} {n}
                         </TableHead>
                       ))}
-                      {/* распорка: забирает лишнюю ширину, чтобы колонки игр были плотными */}
-                      <TableHead className="w-full" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -162,10 +160,10 @@ export default async function MatchPage({
                             {row.name}
                           </Link>
                         </TableCell>
-                        <TableCell className="sticky left-[200px] z-10 w-14 min-w-14 max-w-14 bg-background text-right tabular-nums">
+                        <TableCell className="sticky left-[200px] z-10 w-16 min-w-16 max-w-16 bg-background text-right tabular-nums">
                           {row.kills}
                         </TableCell>
-                        <TableCell className="sticky left-[256px] z-10 w-14 min-w-14 max-w-14 border-r border-border bg-background text-right font-medium tabular-nums">
+                        <TableCell className="sticky left-[264px] z-10 w-16 min-w-16 max-w-16 bg-background text-right font-medium tabular-nums shadow-[inset_-1px_0_0_0_var(--border)]">
                           {row.points}
                         </TableCell>
                         {gameNumbers.map((n) => (
@@ -176,7 +174,6 @@ export default async function MatchPage({
                             {row.places[n] ?? "—"}
                           </TableCell>
                         ))}
-                        <TableCell className="w-full" />
                       </TableRow>
                     ))}
                   </TableBody>
