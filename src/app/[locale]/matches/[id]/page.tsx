@@ -101,7 +101,7 @@ export default async function MatchPage({
   }
   const topFraggers = [...fragMap.values()]
     .sort((a, b) => b.kills - a.kills)
-    .slice(0, 10);
+    .slice(0, 5);
 
   return (
     <>

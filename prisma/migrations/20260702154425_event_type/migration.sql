@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "EventType" AS ENUM ('CHALLENGER_CIRCUIT', 'ONLINE_OPEN', 'PRO_LEAGUE_QUALIFIER', 'PRO_LEAGUE', 'SPLIT_PLAYOFFS', 'LCQ', 'CHAMPIONSHIP', 'OTHER');
+
+-- AlterTable
+ALTER TABLE "Tournament" ADD COLUMN     "eventType" "EventType";

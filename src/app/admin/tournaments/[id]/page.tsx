@@ -6,8 +6,33 @@ import {
   addStream,
   updateTournamentStatus,
   setDgsTournamentId,
+  updateTournamentLeague,
+  createStage,
+  createGroup,
+  assignTeamToGroup,
+  assignMatch,
 } from "../../actions";
 import { effectiveMatchStatus } from "@/lib/match-status";
+
+const FORMATS = [
+  "SINGLE_LOBBY",
+  "MATCH_POINT",
+  "ROUND_ROBIN",
+  "BRACKET",
+  "LEAGUE",
+  "OTHER",
+] as const;
+
+const EVENT_TYPES = [
+  "CHALLENGER_CIRCUIT",
+  "ONLINE_OPEN",
+  "PRO_LEAGUE_QUALIFIER",
+  "PRO_LEAGUE",
+  "SPLIT_PLAYOFFS",
+  "LCQ",
+  "CHAMPIONSHIP",
+  "OTHER",
+] as const;
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +59,20 @@ export default async function AdminTournamentPage({
     include: {
       matches: {
         orderBy: { order: "asc" },
-        include: { _count: { select: { games: true, streams: true } } },
+        include: {
+          stage: true,
+          group: true,
+          _count: { select: { games: true, streams: true } },
+        },
+      },
+      stages: {
+        orderBy: { order: "asc" },
+        include: {
+          groups: {
+            orderBy: { order: "asc" },
+            include: { teams: { include: { team: true } } },
+          },
+        },
       },
       streams: true,
     },
@@ -45,6 +83,17 @@ export default async function AdminTournamentPage({
   const dgsRef = await prisma.externalRef.findFirst({
     where: { source: "dgs", entityType: "tournament", entityId: tournament.id },
   });
+
+  // Справочники для форм.
+  const seasons = await prisma.season.findMany({
+    orderBy: { startDate: "desc" },
+    include: { splits: { orderBy: { order: "asc" } } },
+  });
+  const teams = await prisma.team.findMany({ orderBy: { name: "asc" } });
+  // Плоский список групп «Стадия — Группа» для привязки матчей.
+  const allGroups = tournament.stages.flatMap((s) =>
+    s.groups.map((g) => ({ id: g.id, label: `${s.name} — ${g.name}` })),
+  );
 
   return (
     <main className="mx-auto w-full max-w-4xl px-6 py-10">
@@ -99,6 +148,205 @@ export default async function AdminTournamentPage({
           ? `Привязан к DGS #${dgsRef.externalId}. Запустите «npm run ingest dgs», чтобы обновить статистику.`
           : "Укажите ID турнира из адреса на apexlegendsstatus.com, чтобы тянуть его статистику."}
       </p>
+
+      {/* Лига и формат */}
+      <section className="mt-10">
+        <h2 className="mb-3 text-lg font-semibold">Лига и формат</h2>
+        <form
+          action={updateTournamentLeague}
+          className="flex flex-wrap items-end gap-2 rounded-md border p-4"
+        >
+          <input type="hidden" name="id" value={tournament.id} />
+          <label className={label}>
+            Серия
+            <input
+              name="series"
+              defaultValue={tournament.series ?? ""}
+              placeholder="ALGS (пусто = прочее)"
+              className={input}
+            />
+          </label>
+          <label className={label}>
+            Формат
+            <select name="format" defaultValue={tournament.format} className={input}>
+              {FORMATS.map((f) => (
+                <option key={f} value={f}>
+                  {f}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={label}>
+            Тип события
+            <select
+              name="eventType"
+              defaultValue={tournament.eventType ?? "none"}
+              className={input}
+            >
+              <option value="none">—</option>
+              {EVENT_TYPES.map((e) => (
+                <option key={e} value={e}>
+                  {e}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={label}>
+            Сезон
+            <select
+              name="seasonId"
+              defaultValue={tournament.seasonId ?? "none"}
+              className={input}
+            >
+              <option value="none">— без сезона —</option>
+              {seasons.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={label}>
+            Сплит
+            <select
+              name="splitId"
+              defaultValue={tournament.splitId ?? "none"}
+              className={input}
+            >
+              <option value="none">— без сплита —</option>
+              {seasons.flatMap((s) =>
+                s.splits.map((sp) => (
+                  <option key={sp.id} value={sp.id}>
+                    {s.name} — {sp.name}
+                  </option>
+                )),
+              )}
+            </select>
+          </label>
+          <button type="submit" className={btn}>
+            Сохранить
+          </button>
+        </form>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Сплит должен принадлежать выбранному сезону.
+        </p>
+      </section>
+
+      {/* Стадии и группы */}
+      <section className="mt-10">
+        <h2 className="mb-3 text-lg font-semibold">Стадии и группы</h2>
+        <div className="mb-4 space-y-4">
+          {tournament.stages.length === 0 && (
+            <p className="text-sm text-muted-foreground">Пока нет стадий.</p>
+          )}
+          {tournament.stages.map((stage) => (
+            <div key={stage.id} className="rounded-md border p-4">
+              <div className="mb-2 text-sm font-medium">
+                {stage.name}
+                {stage.format && (
+                  <span className="ml-2 text-muted-foreground">
+                    {stage.format}
+                  </span>
+                )}
+              </div>
+
+              {/* Группы стадии */}
+              <ul className="mb-3 space-y-2">
+                {stage.groups.map((g) => (
+                  <li key={g.id} className="rounded border px-3 py-2 text-sm">
+                    <div className="font-medium">{g.name}</div>
+                    <div className="mt-1 text-muted-foreground">
+                      {g.teams.length === 0
+                        ? "команды не назначены"
+                        : g.teams.map((gt) => gt.team.name).join(", ")}
+                    </div>
+                    <form
+                      action={assignTeamToGroup}
+                      className="mt-2 flex flex-wrap items-end gap-2"
+                    >
+                      <input type="hidden" name="groupId" value={g.id} />
+                      <input
+                        type="hidden"
+                        name="tournamentId"
+                        value={tournament.id}
+                      />
+                      <select name="teamId" required className={input}>
+                        {teams.map((tm) => (
+                          <option key={tm.id} value={tm.id}>
+                            {tm.name}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="number"
+                        name="seed"
+                        placeholder="сид"
+                        className={`${input} w-20`}
+                      />
+                      <button type="submit" className={btn}>
+                        В группу
+                      </button>
+                    </form>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Добавить группу в стадию */}
+              <form
+                action={createGroup}
+                className="flex flex-wrap items-end gap-2"
+              >
+                <input type="hidden" name="stageId" value={stage.id} />
+                <input
+                  type="hidden"
+                  name="tournamentId"
+                  value={tournament.id}
+                />
+                <input
+                  name="name"
+                  required
+                  placeholder="Group A"
+                  className={input}
+                />
+                <button type="submit" className={btn}>
+                  Добавить группу
+                </button>
+              </form>
+            </div>
+          ))}
+        </div>
+
+        {/* Добавить стадию */}
+        <form
+          action={createStage}
+          className="flex flex-wrap items-end gap-2 rounded-md border p-4"
+        >
+          <input type="hidden" name="tournamentId" value={tournament.id} />
+          <label className={`${label} flex-1`}>
+            Название стадии*
+            <input
+              name="name"
+              required
+              placeholder="Group Stage / Regional Finals"
+              className={input}
+            />
+          </label>
+          <label className={label}>
+            Формат
+            <select name="format" defaultValue="none" className={input}>
+              <option value="none">—</option>
+              {FORMATS.map((f) => (
+                <option key={f} value={f}>
+                  {f}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button type="submit" className={btn}>
+            Добавить стадию
+          </button>
+        </form>
+      </section>
 
       {/* Матчи */}
       <section className="mt-10">
@@ -181,6 +429,53 @@ export default async function AdminTournamentPage({
                     Сохранить
                   </button>
                 </form>
+
+                {tournament.stages.length > 0 && (
+                  <form
+                    action={assignMatch}
+                    className="mt-2 flex flex-wrap items-end gap-2 border-t pt-2"
+                  >
+                    <input type="hidden" name="id" value={m.id} />
+                    <input
+                      type="hidden"
+                      name="tournamentId"
+                      value={tournament.id}
+                    />
+                    <label className={label}>
+                      Стадия
+                      <select
+                        name="stageId"
+                        defaultValue={m.stageId ?? "none"}
+                        className={input}
+                      >
+                        <option value="none">—</option>
+                        {tournament.stages.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className={label}>
+                      Группа
+                      <select
+                        name="groupId"
+                        defaultValue={m.groupId ?? "none"}
+                        className={input}
+                      >
+                        <option value="none">—</option>
+                        {allGroups.map((g) => (
+                          <option key={g.id} value={g.id}>
+                            {g.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <button type="submit" className={btn}>
+                      Привязать
+                    </button>
+                  </form>
+                )}
               </li>
             );
           })}

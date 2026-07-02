@@ -6,6 +6,7 @@ import { LanguageSwitcher } from "./language-switcher";
 import { cn } from "@/lib/utils";
 
 const NAV = [
+  { href: "/algs", key: "algs" },
   { href: "/tournaments", key: "tournaments" },
   { href: "/stats", key: "stats" },
 ] as const;

@@ -12,19 +12,62 @@ datasource db {
 
 // ============ СПРАВОЧНИКИ ============
 
+// Верхний уровень лиги: сезон (напр. «ALGS Year 6 / 2025-26»).
+// Необязателен — одиночные community-турниры живут без сезона.
+model Season {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String // «ALGS Year 6»
+  series    String? // серия/циркуит: «ALGS» или пусто (прочее)
+  organizer String? // EA / Respawn
+  startDate DateTime?
+  endDate   DateTime?
+  logoUrl   String?
+
+  splits             Split[]
+  tournaments        Tournament[]
+  championshipPoints ChampionshipPoint[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Подразделение сезона: сплит (Split 1 / Split 2).
+model Split {
+  id       String @id @default(cuid())
+  seasonId String
+  season   Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  slug     String @unique
+  name     String // «Split 1»
+  order    Int    @default(0)
+
+  tournaments Tournament[]
+
+  @@index([seasonId])
+}
+
 model Tournament {
-  id            String      @id @default(cuid())
-  slug          String      @unique // для URL: /tournaments/algs-y4-champs
+  id            String           @id @default(cuid())
+  slug          String           @unique // для URL: /tournaments/algs-y4-champs
   name          String
   region        String? // EMEA / NA / APAC / Global
   tier          String? // official / community / S / A / B
+  series        String? // серия/циркуит: «ALGS» или пусто (прочее)
+  eventType     EventType? // тип/тир события в пайплайне (Online Open / Pro League / Playoffs / …)
+  format        TournamentFormat @default(SINGLE_LOBBY) // формат: одиночное лобби / лига / …
   organizer     String?
   logoUrl       String?
   startDate     DateTime?
   endDate       DateTime?
-  status        EventStatus @default(UPCOMING)
+  status        EventStatus      @default(UPCOMING)
   descriptionRu String? // опц. локализованное описание
   descriptionEn String?
+
+  // Привязка к лиге (необязательна — у community-турниров пусто).
+  seasonId String?
+  season   Season? @relation(fields: [seasonId], references: [id])
+  splitId  String?
+  split    Split?  @relation(fields: [splitId], references: [id])
 
   stages       Stage[]
   matches      Match[]
@@ -35,15 +78,48 @@ model Tournament {
   updatedAt DateTime @updatedAt
 
   @@index([status, startDate])
+  @@index([seasonId])
 }
 
 model Stage {
-  id           String     @id @default(cuid())
+  id           String            @id @default(cuid())
   tournamentId String
-  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  tournament   Tournament        @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   name         String // Group Stage / Playoffs / Finals
-  order        Int        @default(0)
-  matches      Match[]
+  format       TournamentFormat? // формат конкретной стадии (round-robin / match-point / …)
+  order        Int               @default(0)
+
+  groups  Group[]
+  matches Match[]
+
+  @@index([tournamentId])
+}
+
+// Группа внутри стадии (Group A / B / C). Для форматов с групповым делением.
+model Group {
+  id      String @id @default(cuid())
+  stageId String
+  stage   Stage  @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  name    String // «Group A»
+  order   Int    @default(0)
+
+  teams   GroupTeam[]
+  matches Match[]
+
+  @@index([stageId])
+}
+
+// Состав группы: какие команды закреплены за группой (для групповых форматов).
+model GroupTeam {
+  id      String @id @default(cuid())
+  groupId String
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  teamId  String
+  team    Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  seed    Int?
+
+  @@unique([groupId, teamId])
+  @@index([teamId])
 }
 
 model Match {
@@ -52,6 +128,8 @@ model Match {
   tournament   Tournament  @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   stageId      String?
   stage        Stage?      @relation(fields: [stageId], references: [id])
+  groupId      String? // если серия относится к одной группе (сетка / простой групповой формат)
+  group        Group?      @relation(fields: [groupId], references: [id])
   label        String // «Day 1 — Group A»
   scheduledAt  DateTime? // начало окна трансляции
   endsAt       DateTime? // конец окна; если пусто — считаем start + дефолтная длительность
@@ -93,11 +171,13 @@ model Team {
   logoUrl String?
   region  String?
 
-  rosterSpots  Roster[]
-  participants TournamentParticipant[]
-  teamResults  TeamGameResult[]
-  playerStats  PlayerGameStat[]
-  streams      Stream[]
+  rosterSpots        Roster[]
+  participants       TournamentParticipant[]
+  teamResults        TeamGameResult[]
+  playerStats        PlayerGameStat[]
+  streams            Stream[]
+  groupTeams         GroupTeam[]
+  championshipPoints ChampionshipPoint[]
 }
 
 model Player {
@@ -209,6 +289,22 @@ model Stream {
   @@index([tournamentId])
 }
 
+// Сквозные «очки чемпионата»: копятся командой в рамках сезона за отдельные события.
+// Задаются явно (правила лиги), не выводятся из наших пер-гейм очков.
+model ChampionshipPoint {
+  id           String  @id @default(cuid())
+  seasonId     String
+  season       Season  @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  teamId       String
+  team         Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  tournamentId String? // источник очков (напр. «Split 1 Pro League»)
+  points       Int     @default(0)
+  note         String?
+
+  @@index([seasonId, teamId])
+  @@index([teamId])
+}
+
 // ============ СЛУЖЕБНОЕ ============
 
 // Связь наших записей с ID во внешних источниках (DGS, Liquipedia, ALS API)
@@ -251,4 +347,26 @@ enum StreamType {
   PLAYER_POV
   CASTER
   WATCH_PARTY
+}
+
+// Тип/тир события в пайплайне ALGS (порядок = путь команды снизу вверх).
+enum EventType {
+  CHALLENGER_CIRCUIT // низовые открытые серии
+  ONLINE_OPEN // открытые онлайн-квалы
+  PRO_LEAGUE_QUALIFIER // квала в про-лигу
+  PRO_LEAGUE // про-лига (регулярка + Regional Final)
+  SPLIT_PLAYOFFS // LAN-плейофф сплита
+  LCQ // Last Chance Qualifier
+  CHAMPIONSHIP // финал сезона
+  OTHER
+}
+
+// Формат турнира/стадии. Используется для бейджа и группировки.
+enum TournamentFormat {
+  SINGLE_LOBBY // одиночное лобби: серия игр, очки суммируются
+  MATCH_POINT // до порога очков + победа (финалы)
+  ROUND_ROBIN // групповая стадия round-robin (группы играют друг против друга)
+  BRACKET // сетка на выбывание
+  LEAGUE // многостадийная лига (несколько стадий/групп)
+  OTHER
 }

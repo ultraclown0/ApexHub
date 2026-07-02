@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TournamentFilters } from "@/components/tournament-filters";
 import { RegionTag } from "@/components/region-tag";
+import { FormatBadge } from "@/components/format-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,7 @@ export default async function TournamentsPage({
   const sp = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("Tournaments");
+  const tf = await getTranslations("Format");
 
   const all = await getTournaments();
 
@@ -92,6 +94,10 @@ export default async function TournamentsPage({
                         {tournament.region && (
                           <RegionTag region={tournament.region} />
                         )}
+                        <FormatBadge
+                          format={tournament.format}
+                          label={tf(tournament.format)}
+                        />
                         <span>
                           {tournament._count.participants} {t("teams")}
                         </span>

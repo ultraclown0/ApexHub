@@ -4,9 +4,11 @@ import { effectiveMatchStatus, effectiveMatchEnd } from "@/lib/match-status";
 // Окно, за которое ещё имеет смысл проверять «идёт ли матч» (страховка размера выборки).
 const LOOKBACK_MS = 48 * 60 * 60 * 1000;
 
-// Список турниров для каталога (со счётчиком команд-участников).
+// Список турниров для каталога «Турниры» — всё, КРОМЕ ALGS (те живут в разделе ALGS).
+// series = NULL тоже считается «не-ALGS» (в SQL `!= 'ALGS'` отбросил бы NULL).
 export function getTournaments() {
   return prisma.tournament.findMany({
+    where: { OR: [{ series: null }, { series: { not: "ALGS" } }] },
     orderBy: [{ startDate: "desc" }],
     include: {
       _count: { select: { participants: true, matches: true } },
@@ -14,11 +16,47 @@ export function getTournaments() {
   });
 }
 
-// Турнир по slug: участники (итоговая таблица) + матчи.
+// ===== Раздел ALGS =====
+
+// Сезоны ALGS (лиги).
+export function getAlgsSeasons() {
+  return prisma.season.findMany({
+    where: { series: "ALGS" },
+    orderBy: [{ startDate: "desc" }],
+    include: { _count: { select: { tournaments: true, splits: true } } },
+  });
+}
+
+// Отдельные ALGS-турниры (серия ALGS, но не привязаны к сезону).
+export function getAlgsStandaloneTournaments() {
+  return prisma.tournament.findMany({
+    where: { series: "ALGS", seasonId: null },
+    orderBy: [{ startDate: "desc" }],
+    include: { _count: { select: { participants: true } } },
+  });
+}
+
+// Турнир по slug: лига (сезон/сплит), стадии+группы (составы), участники, матчи с результатами.
 export function getTournamentBySlug(slug: string) {
   return prisma.tournament.findUnique({
     where: { slug },
     include: {
+      season: true,
+      split: true,
+      stages: {
+        orderBy: [{ order: "asc" }],
+        include: {
+          groups: {
+            orderBy: [{ order: "asc" }],
+            include: {
+              teams: {
+                orderBy: [{ seed: "asc" }],
+                include: { team: true },
+              },
+            },
+          },
+        },
+      },
       participants: {
         orderBy: [{ finalPlacement: "asc" }],
         include: {
@@ -36,11 +74,65 @@ export function getTournamentBySlug(slug: string) {
         orderBy: [{ order: "asc" }],
         include: {
           stage: true,
+          group: true,
           _count: { select: { games: true } },
+          games: {
+            include: {
+              teamResults: { include: { team: true } },
+            },
+          },
         },
       },
     },
   });
+}
+
+// ===== Лиги / сезоны =====
+
+// Список сезонов (для индекса «Лиги»).
+export function getSeasons() {
+  return prisma.season.findMany({
+    orderBy: [{ startDate: "desc" }],
+    include: {
+      _count: { select: { tournaments: true, splits: true } },
+    },
+  });
+}
+
+// Сезон по slug: сплиты + события (турниры) + агрегированные очки чемпионата.
+export async function getSeasonBySlug(slug: string) {
+  const season = await prisma.season.findUnique({
+    where: { slug },
+    include: {
+      splits: { orderBy: [{ order: "asc" }] },
+      tournaments: {
+        orderBy: [{ startDate: "asc" }],
+        include: { _count: { select: { participants: true } } },
+      },
+    },
+  });
+  if (!season) return null;
+  const championship = await getChampionshipStandings(season.id);
+  return { season, championship };
+}
+
+// Сквозные очки чемпионата: сумма по командам в рамках сезона.
+export async function getChampionshipStandings(seasonId: string) {
+  const grouped = await prisma.championshipPoint.groupBy({
+    by: ["teamId"],
+    where: { seasonId },
+    _sum: { points: true },
+    orderBy: { _sum: { points: "desc" } },
+  });
+  if (grouped.length === 0) return [];
+  const teams = await prisma.team.findMany({
+    where: { id: { in: grouped.map((g) => g.teamId) } },
+  });
+  const byId = new Map(teams.map((t) => [t.id, t]));
+  return grouped.map((g) => ({
+    team: byId.get(g.teamId)!,
+    points: g._sum.points ?? 0,
+  }));
 }
 
 // Матч по id: игры с результатами команд + статистика игроков + стримы.
@@ -320,3 +412,4 @@ export type TournamentListItem = Awaited<
 >[number];
 export type TournamentDetail = Awaited<ReturnType<typeof getTournamentBySlug>>;
 export type MatchDetail = Awaited<ReturnType<typeof getMatchById>>;
+export type SeasonDetail = Awaited<ReturnType<typeof getSeasonBySlug>>;

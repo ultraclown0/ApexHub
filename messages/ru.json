@@ -4,8 +4,54 @@
     "description": "Турнирный Apex Legends: мультистримы и статистика матчей"
   },
   "Nav": {
+    "algs": "ALGS",
     "tournaments": "Турниры",
     "stats": "Статистика"
+  },
+  "Algs": {
+    "title": "ALGS",
+    "subtitle": "Apex Legends Global Series — официальный турнирный цикл EA / Respawn.",
+    "seasons": "Сезоны",
+    "standalone": "Отдельные турниры",
+    "empty": "Пока нет данных ALGS.",
+    "splits": "сплитов",
+    "events": "событий",
+    "teams": "команд"
+  },
+  "Format": {
+    "SINGLE_LOBBY": "Одиночное лобби",
+    "MATCH_POINT": "Match Point",
+    "ROUND_ROBIN": "Round-robin",
+    "BRACKET": "Плей-офф сетка",
+    "LEAGUE": "Лига",
+    "OTHER": "Другое"
+  },
+  "EventType": {
+    "CHALLENGER_CIRCUIT": "Challenger Circuit",
+    "ONLINE_OPEN": "Online Open",
+    "PRO_LEAGUE_QUALIFIER": "Pro League Qualifier",
+    "PRO_LEAGUE": "Pro League",
+    "SPLIT_PLAYOFFS": "Split Playoffs",
+    "LCQ": "Last Chance Qualifier",
+    "CHAMPIONSHIP": "Championship",
+    "OTHER": "Другое"
+  },
+  "Seasons": {
+    "title": "Лиги и сезоны",
+    "empty": "Сезонов пока нет.",
+    "notFound": "Сезон не найден.",
+    "splits": "сплитов",
+    "events": "событий",
+    "eventsTitle": "События",
+    "noEvents": "Событий пока нет.",
+    "championship": "Очки чемпионата",
+    "championshipHint": "Сквозной зачёт сезона — путь к финальному чемпионату.",
+    "seasonLevel": "Финал сезона",
+    "noChampionship": "Очки чемпионата пока не начислены.",
+    "rank": "#",
+    "team": "Команда",
+    "points": "Очки",
+    "teams": "команд"
   },
   "Footer": {
     "tagline": "Некоммерческий хаб турнирного Apex Legends: мультистримы и статистика матчей.",
@@ -109,8 +155,16 @@
     "team": "Команда",
     "points": "Очки",
     "games": "игр",
+    "gamesShort": "И",
+    "wins": "Победы",
+    "kills": "Киллы",
+    "avgPlace": "Сред. место",
+    "overall": "Итоговая таблица",
+    "noStandings": "Нет данных для таблицы.",
     "noMatches": "Матчей пока нет.",
-    "noParticipants": "Участников пока нет."
+    "noParticipants": "Участников пока нет.",
+    "group": "Группа",
+    "noStage": "Прочие матчи"
   },
   "Match": {
     "notFound": "Матч не найден.",

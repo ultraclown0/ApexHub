@@ -4,8 +4,54 @@
     "description": "Tournament Apex Legends: multi-stream viewing and match stats"
   },
   "Nav": {
+    "algs": "ALGS",
     "tournaments": "Tournaments",
     "stats": "Stats"
+  },
+  "Algs": {
+    "title": "ALGS",
+    "subtitle": "Apex Legends Global Series — the official EA / Respawn competitive circuit.",
+    "seasons": "Seasons",
+    "standalone": "Standalone tournaments",
+    "empty": "No ALGS data yet.",
+    "splits": "splits",
+    "events": "events",
+    "teams": "teams"
+  },
+  "Format": {
+    "SINGLE_LOBBY": "Single lobby",
+    "MATCH_POINT": "Match Point",
+    "ROUND_ROBIN": "Round-robin",
+    "BRACKET": "Bracket",
+    "LEAGUE": "League",
+    "OTHER": "Other"
+  },
+  "EventType": {
+    "CHALLENGER_CIRCUIT": "Challenger Circuit",
+    "ONLINE_OPEN": "Online Open",
+    "PRO_LEAGUE_QUALIFIER": "Pro League Qualifier",
+    "PRO_LEAGUE": "Pro League",
+    "SPLIT_PLAYOFFS": "Split Playoffs",
+    "LCQ": "Last Chance Qualifier",
+    "CHAMPIONSHIP": "Championship",
+    "OTHER": "Other"
+  },
+  "Seasons": {
+    "title": "Leagues & seasons",
+    "empty": "No seasons yet.",
+    "notFound": "Season not found.",
+    "splits": "splits",
+    "events": "events",
+    "eventsTitle": "Events",
+    "noEvents": "No events yet.",
+    "championship": "Championship points",
+    "championshipHint": "Season-long standings — the path to the final Championship.",
+    "seasonLevel": "Season finale",
+    "noChampionship": "No championship points awarded yet.",
+    "rank": "#",
+    "team": "Team",
+    "points": "Points",
+    "teams": "teams"
   },
   "Footer": {
     "tagline": "A non-commercial hub for tournament Apex Legends: multi-stream viewing and match stats.",
@@ -109,8 +155,16 @@
     "team": "Team",
     "points": "Points",
     "games": "games",
+    "gamesShort": "G",
+    "wins": "Wins",
+    "kills": "Kills",
+    "avgPlace": "Avg place",
+    "overall": "Overall standings",
+    "noStandings": "No standings data yet.",
     "noMatches": "No matches yet.",
-    "noParticipants": "No participants yet."
+    "noParticipants": "No participants yet.",
+    "group": "Group",
+    "noStage": "Other matches"
   },
   "Match": {
     "notFound": "Match not found.",

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 const REGION_STYLES: Record<string, string> = {
   EMEA: "bg-sky-500/15 text-sky-300 border-sky-500/30",
   NA: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+  AMERICAS: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
   APAC: "bg-violet-500/15 text-violet-300 border-violet-500/30",
   "APAC NORTH": "bg-violet-500/15 text-violet-300 border-violet-500/30",
   "APAC SOUTH": "bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30",
