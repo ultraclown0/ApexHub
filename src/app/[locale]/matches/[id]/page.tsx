@@ -28,7 +28,7 @@ function Placement({ place }: { place: number | null }) {
   if (!medal) return <>{place}</>;
   return (
     <span
-      className={`inline-flex size-6 items-center justify-center rounded-md text-xs font-semibold ${medal}`}
+      className={`inline-flex size-[1lh] items-center justify-center rounded font-semibold ${medal}`}
     >
       {place}
     </span>
