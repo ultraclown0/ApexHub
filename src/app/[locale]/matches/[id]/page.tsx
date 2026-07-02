@@ -156,12 +156,17 @@ export default async function MatchPage({
                         {t("table.points")}
                       </TableHead>
                       {gameNumbers.map((n) => (
-                        <TableHead
-                          key={n}
-                          className="text-center"
-                          title={gameMapByNumber.get(n) ?? undefined}
-                        >
-                          {t("game")} {n}
+                        <TableHead key={n} className="text-center">
+                          <span className="flex flex-col items-center leading-tight">
+                            <span>
+                              {t("game")} {n}
+                            </span>
+                            {gameMapByNumber.get(n) && (
+                              <span className="text-[10px] font-normal text-muted-foreground">
+                                {gameMapByNumber.get(n)}
+                              </span>
+                            )}
+                          </span>
                         </TableHead>
                       ))}
                     </TableRow>
@@ -200,11 +205,6 @@ export default async function MatchPage({
                   </TableBody>
                 </Table>
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {gameNumbers
-                  .map((n) => `${t("game")} ${n}: ${gameMapByNumber.get(n) ?? "—"}`)
-                  .join(" · ")}
-              </p>
             </section>
           )}
 
