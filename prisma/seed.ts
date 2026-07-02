@@ -170,6 +170,7 @@ async function main() {
   await prisma.roster.deleteMany();
   await prisma.tournamentParticipant.deleteMany();
   await prisma.stream.deleteMany();
+  await prisma.externalRef.deleteMany();
   await prisma.player.deleteMany();
   await prisma.team.deleteMany();
   await prisma.tournament.deleteMany();

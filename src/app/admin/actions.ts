@@ -61,6 +61,33 @@ export async function updateTournamentStatus(formData: FormData) {
   revalidatePath(`/admin/tournaments/${id}`);
 }
 
+// Привязать турнир к его ID в DGS (apexlegendsstatus.com) — источник статистики.
+// ID виден в адресе на сайте DGS: /tournament/results/<ID>/... . Пусто = отвязать.
+export async function setDgsTournamentId(formData: FormData) {
+  const id = str(formData, "id");
+  if (!id) return;
+  const dgsId = str(formData, "dgsId");
+
+  // Сначала убираем прежнюю привязку этого турнира (если была).
+  await prisma.externalRef.deleteMany({
+    where: { source: "dgs", entityType: "tournament", entityId: id },
+  });
+  if (dgsId) {
+    await prisma.externalRef.upsert({
+      where: {
+        source_entityType_externalId: {
+          source: "dgs",
+          entityType: "tournament",
+          externalId: dgsId,
+        },
+      },
+      create: { source: "dgs", entityType: "tournament", entityId: id, externalId: dgsId },
+      update: { entityId: id },
+    });
+  }
+  revalidatePath(`/admin/tournaments/${id}`);
+}
+
 export async function createMatch(formData: FormData) {
   const tournamentId = str(formData, "tournamentId");
   const label = str(formData, "label");

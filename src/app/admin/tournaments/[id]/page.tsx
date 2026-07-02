@@ -5,6 +5,7 @@ import {
   updateMatch,
   addStream,
   updateTournamentStatus,
+  setDgsTournamentId,
 } from "../../actions";
 import { effectiveMatchStatus } from "@/lib/match-status";
 
@@ -40,6 +41,11 @@ export default async function AdminTournamentPage({
   });
   if (!tournament) notFound();
 
+  // Текущая привязка к DGS (если есть).
+  const dgsRef = await prisma.externalRef.findFirst({
+    where: { source: "dgs", entityType: "tournament", entityId: tournament.id },
+  });
+
   return (
     <main className="mx-auto w-full max-w-4xl px-6 py-10">
       <a
@@ -71,6 +77,28 @@ export default async function AdminTournamentPage({
           Сохранить
         </button>
       </form>
+
+      {/* Привязка к DGS (источник статистики) */}
+      <form action={setDgsTournamentId} className="mt-4 flex items-end gap-2">
+        <input type="hidden" name="id" value={tournament.id} />
+        <label className={`${label} flex-1`}>
+          DGS ID турнира
+          <input
+            name="dgsId"
+            defaultValue={dgsRef?.externalId ?? ""}
+            placeholder="напр. 4737 (из адреса на apexlegendsstatus.com)"
+            className={input}
+          />
+        </label>
+        <button type="submit" className={btn}>
+          Привязать
+        </button>
+      </form>
+      <p className="mt-2 text-sm text-muted-foreground">
+        {dgsRef
+          ? `Привязан к DGS #${dgsRef.externalId}. Запустите «npm run ingest dgs», чтобы обновить статистику.`
+          : "Укажите ID турнира из адреса на apexlegendsstatus.com, чтобы тянуть его статистику."}
+      </p>
 
       {/* Матчи */}
       <section className="mt-10">
