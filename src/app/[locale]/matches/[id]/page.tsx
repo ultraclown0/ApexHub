@@ -139,7 +139,7 @@ export default async function MatchPage({
           {summary.length > 0 && (
             <section>
               <h2 className="mb-3 text-xl font-semibold">{t("stats")}</h2>
-              <div className="rounded-md border [&_[data-slot=table-container]]:rounded-md">
+              <div>
                 <Table>
                   <TableHeader>
                     <TableRow>
