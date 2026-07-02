@@ -124,16 +124,16 @@ export default async function MatchPage({
                     <TableRow>
                       <TableHead className="w-10">{t("table.place")}</TableHead>
                       <TableHead className="min-w-32">{t("table.team")}</TableHead>
-                      {gameNumbers.map((n) => (
+                      {gameNumbers.map((n, idx) => (
                         <TableHead
                           key={n}
-                          className="text-center"
+                          className={`text-center ${idx === 0 ? "border-l border-border" : ""}`}
                           title={gameMapByNumber.get(n) ?? undefined}
                         >
                           {t("game")} {n}
                         </TableHead>
                       ))}
-                      <TableHead className="text-right">
+                      <TableHead className="border-l border-border text-right">
                         {t("table.kills")}
                       </TableHead>
                       <TableHead className="text-right">
@@ -153,15 +153,15 @@ export default async function MatchPage({
                             {row.name}
                           </Link>
                         </TableCell>
-                        {gameNumbers.map((n) => (
+                        {gameNumbers.map((n, idx) => (
                           <TableCell
                             key={n}
-                            className="text-center tabular-nums text-muted-foreground"
+                            className={`text-center tabular-nums text-muted-foreground ${idx === 0 ? "border-l border-border" : ""}`}
                           >
                             {row.places[n] ?? "—"}
                           </TableCell>
                         ))}
-                        <TableCell className="text-right tabular-nums">
+                        <TableCell className="border-l border-border text-right tabular-nums">
                           {row.kills}
                         </TableCell>
                         <TableCell className="text-right font-medium tabular-nums">
