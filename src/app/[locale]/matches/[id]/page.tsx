@@ -26,25 +26,37 @@ export default async function MatchPage({
 
   if (!match) notFound();
 
-  // Итог матча: сумма очков и киллов по командам за все игры.
-  const summaryMap = new Map<
+  // Сводная таблица: команды (строки) × игры (столбцы: место в каждой игре)
+  // + итоговые киллы и очки за весь матч.
+  const games = match.games; // уже отсортированы по gameNumber (хронология)
+  const gameMapByNumber = new Map(games.map((g) => [g.gameNumber, g.map]));
+  const rowsMap = new Map<
     string,
-    { name: string; slug: string; kills: number; points: number }
+    {
+      name: string;
+      slug: string;
+      places: Record<number, number | null>;
+      kills: number;
+      points: number;
+    }
   >();
-  for (const game of match.games) {
+  for (const game of games) {
     for (const r of game.teamResults) {
-      const cur = summaryMap.get(r.teamId) ?? {
+      const row = rowsMap.get(r.teamId) ?? {
         name: r.team.name,
         slug: r.team.slug,
+        places: {},
         kills: 0,
         points: 0,
       };
-      cur.kills += r.kills;
-      cur.points += r.totalPoints;
-      summaryMap.set(r.teamId, cur);
+      row.places[game.gameNumber] = r.placement ?? null;
+      row.kills += r.kills;
+      row.points += r.totalPoints;
+      rowsMap.set(r.teamId, row);
     }
   }
-  const summary = [...summaryMap.values()].sort((a, b) => b.points - a.points);
+  const summary = [...rowsMap.values()].sort((a, b) => b.points - a.points);
+  const gameNumbers = games.map((g) => g.gameNumber);
 
   // Топ по киллам за весь матч (суммарно по всем играм).
   const fragMap = new Map<
@@ -102,45 +114,69 @@ export default async function MatchPage({
 
         {/* ===== Справа: статистика ===== */}
         <div className="space-y-10">
-          {/* Итог матча */}
+          {/* Сводная таблица: команды × игры + итог */}
           {summary.length > 0 && (
             <section>
               <h2 className="mb-3 text-xl font-semibold">{t("stats")}</h2>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10">{t("table.place")}</TableHead>
-                    <TableHead>{t("table.team")}</TableHead>
-                    <TableHead className="text-right">
-                      {t("table.kills")}
-                    </TableHead>
-                    <TableHead className="text-right">
-                      {t("table.points")}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {summary.map((row, i) => (
-                    <TableRow key={row.slug}>
-                      <TableCell className="font-medium">{i + 1}</TableCell>
-                      <TableCell>
-                        <Link
-                          href={`/teams/${row.slug}`}
-                          className="hover:underline"
+              <div className="overflow-x-auto rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-10">{t("table.place")}</TableHead>
+                      <TableHead className="min-w-32">{t("table.team")}</TableHead>
+                      {gameNumbers.map((n) => (
+                        <TableHead
+                          key={n}
+                          className="text-center"
+                          title={gameMapByNumber.get(n) ?? undefined}
                         >
-                          {row.name}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {row.kills}
-                      </TableCell>
-                      <TableCell className="text-right font-medium tabular-nums">
-                        {row.points}
-                      </TableCell>
+                          {t("game")} {n}
+                        </TableHead>
+                      ))}
+                      <TableHead className="text-right">
+                        {t("table.kills")}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t("table.points")}
+                      </TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {summary.map((row, i) => (
+                      <TableRow key={row.slug}>
+                        <TableCell className="font-medium">{i + 1}</TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          <Link
+                            href={`/teams/${row.slug}`}
+                            className="hover:underline"
+                          >
+                            {row.name}
+                          </Link>
+                        </TableCell>
+                        {gameNumbers.map((n) => (
+                          <TableCell
+                            key={n}
+                            className="text-center tabular-nums text-muted-foreground"
+                          >
+                            {row.places[n] ?? "—"}
+                          </TableCell>
+                        ))}
+                        <TableCell className="text-right tabular-nums">
+                          {row.kills}
+                        </TableCell>
+                        <TableCell className="text-right font-medium tabular-nums">
+                          {row.points}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {gameNumbers
+                  .map((n) => `${t("game")} ${n}: ${gameMapByNumber.get(n) ?? "—"}`)
+                  .join(" · ")}
+              </p>
             </section>
           )}
 
@@ -184,48 +220,6 @@ export default async function MatchPage({
               </Table>
             </section>
           )}
-
-          {/* Места по играм */}
-          {match.games.map((game) => (
-            <section key={game.id}>
-              <h3 className="mb-1 font-semibold">
-                {t("game")} {game.gameNumber}
-                {game.map && (
-                  <span className="ml-2 text-sm font-normal text-muted-foreground">
-                    {game.map}
-                  </span>
-                )}
-              </h3>
-
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10">{t("table.place")}</TableHead>
-                    <TableHead>{t("table.team")}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[...game.teamResults]
-                    .sort((a, b) => (a.placement ?? 99) - (b.placement ?? 99))
-                    .map((r) => (
-                      <TableRow key={r.id}>
-                        <TableCell className="font-medium">
-                          {r.placement}
-                        </TableCell>
-                        <TableCell>
-                          <Link
-                            href={`/teams/${r.team.slug}`}
-                            className="hover:underline"
-                          >
-                            {r.team.name}
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </section>
-          ))}
         </div>
       </div>
     </>
