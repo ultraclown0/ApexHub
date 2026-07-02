@@ -194,6 +194,21 @@ async function ingestOneTournament(
     games.push(g);
   }
 
+  // В части игр DGS кодирует 1-е место значением 0 (без явной «1»). Определяем
+  // для каждой игры: если есть место 0 и нет места 1 → 0 означает 1-е место.
+  // Иначе 0 = «команда не играла эту игру».
+  const zeroIsFirst: boolean[] = [];
+  for (let i = 0; i < gameCount; i++) {
+    let hasOne = false;
+    let hasZero = false;
+    for (const t of teamData) {
+      const raw = t.ranking?.[i];
+      if (raw === 1) hasOne = true;
+      if (raw === 0) hasZero = true;
+    }
+    zeroIsFirst[i] = hasZero && !hasOne;
+  }
+
   // Ранжируем команды по итоговым очкам → финальное место в турнире.
   const ranked = [...teamData].sort((a, b) => num(b.points) - num(a.points));
 
@@ -216,8 +231,10 @@ async function ingestOneTournament(
     // (per-game очки/киллы API не отдаёт), чтобы суммы совпадали с DGS.
     let carried = false;
     for (let i = 0; i < gameCount; i++) {
-      const place = num(t.ranking?.[i]);
-      if (place <= 0) continue;
+      const raw = t.ranking?.[i];
+      let place = num(raw);
+      if (raw === 0 && zeroIsFirst[i]) place = 1; // 0 = 1-е место в этой игре
+      if (place <= 0) continue; // 0 без спец-случая = не играла
       const carry = !carried;
       carried = true;
       await prisma.teamGameResult.create({
