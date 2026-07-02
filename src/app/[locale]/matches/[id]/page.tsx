@@ -202,9 +202,6 @@ export default async function MatchPage({
                   <TableRow>
                     <TableHead className="w-10">{t("table.place")}</TableHead>
                     <TableHead>{t("table.team")}</TableHead>
-                    <TableHead className="text-right">
-                      {t("table.points")}
-                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -222,9 +219,6 @@ export default async function MatchPage({
                           >
                             {r.team.name}
                           </Link>
-                        </TableCell>
-                        <TableCell className="text-right font-medium tabular-nums">
-                          {r.totalPoints}
                         </TableCell>
                       </TableRow>
                     ))}

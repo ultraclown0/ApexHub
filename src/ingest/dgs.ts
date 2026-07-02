@@ -212,21 +212,23 @@ async function ingestOneTournament(
     });
 
     // Место команды по каждой игре (0 = не играла → пропускаем).
+    // Точные ИТОГОВЫЕ очки и киллы из DGS кладём на первую сыгранную игру
+    // (per-game очки/киллы API не отдаёт), чтобы суммы совпадали с DGS.
+    let carried = false;
     for (let i = 0; i < gameCount; i++) {
       const place = num(t.ranking?.[i]);
       if (place <= 0) continue;
-      const pPts = placementPoints(place);
-      // Суммарные киллы турнира кладём в первую игру команды (per-game API не даёт).
-      const isFirst = i === 0;
+      const carry = !carried;
+      carried = true;
       await prisma.teamGameResult.create({
         data: {
           gameId: games[i].id,
           teamId,
           placement: place,
-          kills: isFirst ? kills : 0,
-          killPoints: isFirst ? kills : 0,
-          placementPoints: pPts,
-          totalPoints: pPts + (isFirst ? kills : 0),
+          kills: carry ? kills : 0,
+          killPoints: 0,
+          placementPoints: placementPoints(place),
+          totalPoints: carry ? points : 0,
         },
       });
     }
