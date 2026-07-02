@@ -113,7 +113,7 @@ export default async function MatchPage({
         </section>
 
         {/* ===== Справа: статистика ===== */}
-        <div className="space-y-10">
+        <div className="min-w-0 space-y-10">
           {/* Сводная таблица: команды × игры + итог */}
           {summary.length > 0 && (
             <section>
