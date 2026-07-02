@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 const MEDAL: Record<number, string> = {
   1: "bg-yellow-400 text-black",
   2: "bg-slate-300 text-black",
-  3: "bg-amber-600 text-white",
+  3: "bg-amber-600 text-black",
 };
 
 function Placement({ place }: { place: number | null }) {
